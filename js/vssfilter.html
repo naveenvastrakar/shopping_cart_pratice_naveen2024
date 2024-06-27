@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Products</title>
+    <style>
+      #products-list {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .card {
+        width: 200px;
+        border: 0.4px solid silver;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="search-box">
+        <input type="search" id="search-input" placeholder="Search here" />
+      </div>
+      <div>
+        <h1>My Products</h1>
+        <ul id="products-list"></ul>
+      </div>
+    </div>
+  </body>
+</html>
+<script>
+  const inputSearchElem = document.getElementById("search-input");
+  const productListContainerElem = document.getElementById("products-list");
+
+  // Define blank data variables
+  let products = null;
+  let filterProducts = null;
+
+  // Regex based search
+  /*  inputSearchElem.addEventListener("input", (myPersonalEve) => {
+    const searchKey = myPersonalEve.target.value.toLowerCase();
+
+    // Stop the logic when there's no product
+    if (!products || products.length === 0) return;
+
+    // Create a regular expression from the search key
+    const searchRegex = new RegExp(searchKey, "i"); // "i" flag for case-insensitive search
+
+    // Logic to filter data based on regex
+    filterProducts = products.filter(function (product) {
+        const title = product.title.toLowerCase();
+        const description = product.description.toLowerCase();
+        console.log("Title : ", title);
+
+        return (
+            searchRegex.test(title) || searchRegex.test(description)
+        );
+    });
+});
+ */
+
+  // Add event listener to enable search typing
+  inputSearchElem.addEventListener("input", (myPersonalEve) => {
+    const searchKey = myPersonalEve.target.value.toLowerCase();
+
+    // Stop the logic when there's no product
+    if (!products || products.length === 0) return;
+
+    // Logic to filter data based on key
+    /*  filterProducts = products.filter(
+      (product) => product.title.search(searchKey) !== -1
+    ); */
+
+    filterProducts = products.filter(function (product) {
+      const title = product.title.toLowerCase();
+      const description = product.description.toLowerCase();
+      console.log("Title : ", title);
+
+      //return title.search(searchKey) !== -1 ? true : false;
+      return (
+        title.search(searchKey) !== -1 || description.search(searchKey) !== -1
+      );
+
+      /* if (title.search(searchKey) !== -1) {
+        return true;
+      } else {
+        return false;
+      } */
+    });
+    renderListUI();
+  });
+
+  /* const searchCallbackFunction = (e) => {};
+  inputSearchElem.addEventListener("input", searchCallbackFunction); */
+  // input.addEventListener(eventType, eventCallback)
+
+  // Load data from API
+  fetch("https://fakestoreapi.com/products")
+    .then((data) => data.json())
+    .then((data) => {
+      // Logic
+      products = data;
+      filterProducts = data;
+      renderListUI();
+    })
+    .catch((err) => console.log(err));
+
+  function renderListUI() {
+    console.log("Render data logic called", filterProducts);
+
+    const productFragment = document.createDocumentFragment();
+
+    for (let i = 0; i < filterProducts.length; i++) {
+      const product = filterProducts[i];
+
+      // Old ES5 way
+      /* const title = product.title;
+      const price = product.price;
+      const image = product.image; */
+
+      // New ES6 way - Object destructuring
+      const { title, price, image } = product;
+      console.log({ title, price, image });
+
+      const liElem = document.createElement("li");
+      liElem.className = "card";
+
+      const imageElem = document.createElement("img");
+      const priceElem = document.createElement("p");
+      const titleElem = document.createElement("p");
+
+      // Handling image
+      imageElem.src = image;
+      imageElem.height = 50;
+      imageElem.width = 50;
+
+      // Handling price
+      priceElem.innerText = price;
+
+      // Handling title
+      titleElem.innerText = title;
+
+      liElem.appendChild(imageElem);
+      liElem.appendChild(titleElem);
+      liElem.appendChild(priceElem);
+
+      productFragment.appendChild(liElem);
+    }
+
+    productListContainerElem.innerHTML = "";
+    productListContainerElem.appendChild(productFragment);
+  }
+</script>
